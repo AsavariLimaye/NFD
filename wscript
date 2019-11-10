@@ -46,10 +46,15 @@ def options(opt):
     opt.addDependencyOptions(nfdopt, 'libresolv')
     opt.addDependencyOptions(nfdopt, 'librt')
     opt.addDependencyOptions(nfdopt, 'libpcap')
+    opt.addDependencyOptions(nfdopt, 'libvmac')
+    # opt.addDependencyOptions(nfdopt, 'libm')
+    # opt.addDependencyOptions(nfdopt, 'libpthread')
     nfdopt.add_option('--without-libpcap', action='store_true', default=False,
                       help='Disable libpcap (Ethernet face support will be disabled)')
     nfdopt.add_option('--without-systemd', action='store_true', default=False,
                       help='Disable systemd integration')
+    nfdopt.add_option('--with-vmac', action='store_true', default=False,
+                      help='Use vmac')
     opt.addWebsocketOptions(nfdopt)
 
     nfdopt.add_option('--with-tests', action='store_true', default=False,
@@ -124,6 +129,13 @@ def configure(conf):
         conf.checkDependency(name='libpcap', lib='pcap',
                              errmsg='not found, but required for Ethernet face support. '
                                     'Specify --without-libpcap to disable Ethernet face support.')
+    if conf.options.with_vmac:
+        conf.checkDependency(name='libvmac', lib='vmac',
+                  	     errmsg='not found, but required for vmac face support. ')
+        #conf.checkDependency(name='libpthread', lib='pthread',
+        #                     errmsg='not found, but required for vmac face support. ')
+        #conf.checkDependency(name='libm', lib='m',
+        #                     errmsg='not found, but required for vmac face support. ')
 
     conf.checkWebsocket()
 
@@ -166,6 +178,7 @@ def build(bld):
         target='daemon-objects',
         source=bld.path.ant_glob('daemon/**/*.cpp',
                                  excl=['daemon/face/*ethernet*.cpp',
+				       'daemon/face/*vmac*.cpp',
                                        'daemon/face/pcap*.cpp',
                                        'daemon/face/unix*.cpp',
                                        'daemon/face/websocket*.cpp',
@@ -178,6 +191,9 @@ def build(bld):
         nfd_objects.source += bld.path.ant_glob('daemon/face/*ethernet*.cpp')
         nfd_objects.source += bld.path.ant_glob('daemon/face/pcap*.cpp')
         nfd_objects.use += ' LIBPCAP'
+    if bld.env.HAVE_LIBVMAC:
+        nfd_objects.source += bld.path.ant_glob('daemon/face/*vmac*.cpp')
+	nfd_objects.use += ' LIBVMAC'
 
     if bld.env.HAVE_UNIX_SOCKETS:
         nfd_objects.source += bld.path.ant_glob('daemon/face/unix*.cpp')
@@ -201,6 +217,7 @@ def build(bld):
         source='nfd.conf.sample.in',
         target='nfd.conf.sample',
         install_path='${SYSCONFDIR}/ndn',
+        IF_HAVE_LIBVMAC='' if bld.env.HAVE_LIBVMAC else '; ',
         IF_HAVE_LIBPCAP='' if bld.env.HAVE_LIBPCAP else '; ',
         IF_HAVE_WEBSOCKET='' if bld.env.HAVE_WEBSOCKET else '; ')
 
