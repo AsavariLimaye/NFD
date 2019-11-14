@@ -46,9 +46,9 @@ def options(opt):
     opt.addDependencyOptions(nfdopt, 'libresolv')
     opt.addDependencyOptions(nfdopt, 'librt')
     opt.addDependencyOptions(nfdopt, 'libpcap')
+    opt.addDependencyOptions(nfdopt, 'libm')
+    opt.addDependencyOptions(nfdopt, 'libpthread')
     opt.addDependencyOptions(nfdopt, 'libvmac')
-    # opt.addDependencyOptions(nfdopt, 'libm')
-    # opt.addDependencyOptions(nfdopt, 'libpthread')
     nfdopt.add_option('--without-libpcap', action='store_true', default=False,
                       help='Disable libpcap (Ethernet face support will be disabled)')
     nfdopt.add_option('--without-systemd', action='store_true', default=False,
@@ -130,12 +130,14 @@ def configure(conf):
                              errmsg='not found, but required for Ethernet face support. '
                                     'Specify --without-libpcap to disable Ethernet face support.')
     if conf.options.with_vmac:
-        conf.checkDependency(name='libvmac', lib='vmac',
-                  	     errmsg='not found, but required for vmac face support. ')
-        #conf.checkDependency(name='libpthread', lib='pthread',
-        #                     errmsg='not found, but required for vmac face support. ')
-        #conf.checkDependency(name='libm', lib='m',
-        #                     errmsg='not found, but required for vmac face support. ')
+        conf.checkDependency(name='libpthread', lib='pthread',
+                             errmsg='not found, but required for vmac face support. ')
+        conf.checkDependency(name='libm', lib='m',
+                             errmsg='not found, but required for vmac face support. ')
+        conf.check_cxx(define_name = 'HAVE_LIBVMAC', uselib_store = 'LIBVMAC', mandatory = True, msg = 'Checking for libvmac library')
+        conf.env['HAVE_VMAC'] = True
+        #conf.checkDependency(name='libvmac', lib='vmac',
+        #         	     errmsg='not found, but required for vmac face support. ')
 
     conf.checkWebsocket()
 
@@ -193,7 +195,9 @@ def build(bld):
         nfd_objects.use += ' LIBPCAP'
     if bld.env.HAVE_LIBVMAC:
         nfd_objects.source += bld.path.ant_glob('daemon/face/*vmac*.cpp')
-	nfd_objects.use += ' LIBVMAC'
+        nfd_objects.use += ' LIBPTHREAD'
+        nfd_objects.use += ' LIBM'
+        nfd_objects.use += ' LIBVMAC'
 
     if bld.env.HAVE_UNIX_SOCKETS:
         nfd_objects.source += bld.path.ant_glob('daemon/face/unix*.cpp')

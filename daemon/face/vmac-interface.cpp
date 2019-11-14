@@ -26,7 +26,11 @@
 #include "vmac-interface.hpp"
 
 #include "common/logger.hpp"
-#include "vmac/vmac.h"
+#include<vmac/vmac.h>
+
+void vmac_callback(uint8_t type, uint64_t enc, char* data, uint16_t len, uint16_t seq, char* interest_name, uint16_t
+interest_name_len) {
+}
 
 namespace nfd {
 namespace face {
@@ -34,7 +38,8 @@ namespace face {
 NFD_LOG_INIT(VmacInterface);
 
 VmacInterface::VmacInterface(){
-  vmac_register(NULL);
+  void (*ptr) (uint8_t a, uint64_t b, char* c, uint16_t d, uint16_t e, char* f, uint16_t g) = &vmac_callback;
+  vmac_register(ptr);
   NFD_LOG_INFO("Vmac Interface Initialized");
 }
 
