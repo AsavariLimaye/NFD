@@ -27,7 +27,7 @@
 #define NFD_DAEMON_FACE_VMAC_TRANSPORT_HPP
 
 #include "transport.hpp"
-#include "vmac-interface.hpp"
+// #include "vmac-interface.hpp"
 
 namespace nfd {
 namespace face {
@@ -38,6 +38,7 @@ namespace face {
 class VmacTransport : public Transport
 {
 public:
+	
   class Error : public std::runtime_error
   {
   public:
@@ -49,19 +50,6 @@ public:
 protected:
   void
   doClose() final;
-
-  bool
-  hasRecentlyReceived() const
-  {
-    return m_hasRecentlyReceived;
-  }
-
-  void
-  resetRecentlyReceived()
-  {
-    m_hasRecentlyReceived = false;
-  }
-
 private:
 
   void
@@ -71,17 +59,12 @@ private:
    * @brief Sends the specified TLV block on the network wrapped in an VMAC frame
    */
   void
-  sendPacket(const ndn::Block& block);
-
-  void
   handleError(const std::string& errorMessage);
 
 private:
-  bool m_hasRecentlyReceived;
-  VmacInterface m_vmacInterface;
-#ifdef _DEBUG
-  size_t m_nDropped;
-#endif
+  void initVmac();
+  void sendVmac(const Block& packet);
+  void vmacCallback(uint8_t type,uint64_t enc, char* buff, uint16_t len, uint16_t seq, char* interestName, uint16_t interestNameLen);
 };
 
 } // namespace face

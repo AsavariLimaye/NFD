@@ -134,10 +134,11 @@ def configure(conf):
                              errmsg='not found, but required for vmac face support. ')
         conf.checkDependency(name='libm', lib='m',
                              errmsg='not found, but required for vmac face support. ')
-        conf.check_cxx(define_name = 'HAVE_LIBVMAC', uselib_store = 'LIBVMAC', mandatory = True, msg = 'Checking for libvmac library')
-        conf.env['HAVE_VMAC'] = True
-        #conf.checkDependency(name='libvmac', lib='vmac',
-        #         	     errmsg='not found, but required for vmac face support. ')
+        # if conf.check(compiler='cxx', lib='vmac', mandatory=True,uselib_store='VMAC'):
+	#conf.check_cxx(define_name = 'HAVE_LIBVMAC', uselib_store = 'LIBVMAC', mandatory = True, msg = 'Checking for libvmac library')
+        #	conf.env['HAVE_LIBVMAC'] = True
+        conf.checkDependency(name='libvmac', lib='vmac', use='LIBPTHREAD LIBM',
+                 	     errmsg='not found, but required for vmac face support. ')
 
     conf.checkWebsocket()
 
