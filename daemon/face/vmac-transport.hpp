@@ -47,6 +47,12 @@ public:
 
   VmacTransport();
 
+  void
+  send(const Block& packet, const EndpointId& endpoint);
+
+  void
+  send(const Block& packet, const EndpointId& endpoint, const Name name);
+
 protected:
   void
   doClose() final;
@@ -54,6 +60,9 @@ private:
 
   void
   doSend(const Block& packet, const EndpointId& endpoint) final;
+
+  void
+  doSend(const Block& packet, const EndpointId& endpoint, const Name name);
 
   /**
    * @brief Sends the specified TLV block on the network wrapped in an VMAC frame

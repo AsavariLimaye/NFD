@@ -41,6 +41,12 @@ void vmac_callback(uint8_t type,uint64_t enc, char* buff, uint16_t len, uint16_t
 VmacTransport::VmacTransport()
 {
   initVmac();
+  this->setLocalUri(FaceUri("vmac://local"));
+  this->setRemoteUri(FaceUri("vmac://remote"));
+  this->setScope(ndn::nfd::FACE_SCOPE_NON_LOCAL);
+  this->setPersistency(ndn::nfd::FACE_PERSISTENCY_PERMANENT);
+  this->setLinkType(ndn::nfd::LINK_TYPE_MULTI_ACCESS);
+  this->setMtu(MTU_UNLIMITED);
 }
 
 void
@@ -56,9 +62,45 @@ VmacTransport::doClose()
 }
 
 void
-VmacTransport::doSend(const Block& packet, const EndpointId&)
+VmacTransport::send(const Block& packet, const EndpointId& endpoint)
+{
+   this->send(packet, endpoint, Name());
+}
+
+void
+VmacTransport::send(const Block& packet, const EndpointId& endpoint, Name name)
+{
+
+  BOOST_ASSERT(packet.isValid());
+  BOOST_ASSERT(this->getMtu() == MTU_UNLIMITED ||
+		                   packet.size() <= static_cast<size_t>(this->getMtu()));
+
+  TransportState state = this->getState();
+  if (state != TransportState::UP && state != TransportState::DOWN) {
+    NFD_LOG_FACE_TRACE("send ignored in " << state << " state");
+    return;
+  }
+
+  if (state == TransportState::UP) {
+    ++this->nOutPackets;
+    this->nOutBytes += packet.size();
+  }
+
+  this->doSend(packet, endpoint, name);
+}
+
+void
+VmacTransport::doSend(const Block& packet, const EndpointId& endpoint)
 {
   NFD_LOG_FACE_TRACE(__func__);
+  this->doSend(packet, endpoint, Name());
+}
+
+void
+VmacTransport::doSend(const Block& packet, const EndpointId& endpoint, const Name name)
+{
+  NFD_LOG_FACE_TRACE(__func__);
+  NFD_LOG_INFO("Interest Name" << name);
 }
 
 void

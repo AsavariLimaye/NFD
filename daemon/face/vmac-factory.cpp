@@ -24,7 +24,7 @@
  */
 
 #include "vmac-factory.hpp"
-#include "generic-link-service.hpp"
+#include "vmac-link-service.hpp"
 #include "vmac-transport.hpp"
 
 namespace nfd {
@@ -84,11 +84,11 @@ shared_ptr<Face>
 VmacFactory::createMulticastFace()
 {
   auto key = std::move("vmac");
-  GenericLinkService::Options opts;
+  VmacLinkService::Options opts;
   opts.allowFragmentation = true;
   opts.allowReassembly = true;
 
-  auto linkService = make_unique<GenericLinkService>(opts);
+  auto linkService = make_unique<VmacLinkService>(opts);
   auto transport = make_unique<VmacTransport>();
   auto face = make_shared<Face>(std::move(linkService), std::move(transport));
 
