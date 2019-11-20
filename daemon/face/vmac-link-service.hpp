@@ -188,7 +188,7 @@ PROTECTED_WITH_TESTS_ELSE_PRIVATE: // send path
   /** \brief send an LpPacket to \p endpointId
    */
   void
-  sendLpPacket(lp::Packet&& pkt, const EndpointId& endpointId);
+  sendLpPacket(lp::Packet&& pkt, const EndpointId& endpointId, const Name name);
 
   /** \brief send Interest
    */
@@ -219,7 +219,7 @@ private: // send path
    *  \param isInterest whether the network layer packet is an Interest
    */
   void
-  sendNetPacket(lp::Packet&& pkt, const EndpointId& endpointId, bool isInterest);
+  sendNetPacket(lp::Packet&& pkt, const EndpointId& endpointId, bool isInterest, const Name name);
 
   /** \brief assign a sequence number to an LpPacket
    */

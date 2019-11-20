@@ -68,11 +68,11 @@ VmacLinkService::requestIdlePacket(const EndpointId& endpointId)
 {
   // No need to request Acks to attach to this packet from LpReliability, as they are already
   // attached in sendLpPacket
-  this->sendLpPacket({}, endpointId);
+  this->sendLpPacket({}, endpointId, Name());
 }
 
 void
-VmacLinkService::sendLpPacket(lp::Packet&& pkt, const EndpointId& endpointId)
+VmacLinkService::sendLpPacket(lp::Packet&& pkt, const EndpointId& endpointId, const Name name)
 {
   const ssize_t mtu = this->getTransport()->getMtu();
 
@@ -90,7 +90,7 @@ VmacLinkService::sendLpPacket(lp::Packet&& pkt, const EndpointId& endpointId)
     NFD_LOG_FACE_WARN("attempted to send packet over MTU limit");
     return;
   }
-  this->sendPacket(block, endpointId, Name());
+  this->sendPacket(block, endpointId, name);
 }
 
 void
@@ -100,7 +100,7 @@ VmacLinkService::doSendInterest(const Interest& interest, const EndpointId& endp
 
   encodeLpFields(interest, lpPacket);
 
-  this->sendNetPacket(std::move(lpPacket), endpointId, true);
+  this->sendNetPacket(std::move(lpPacket), endpointId, true, interest.getName());
 }
 
 void
@@ -110,7 +110,7 @@ VmacLinkService::doSendData(const Data& data, const EndpointId& endpointId)
 
   encodeLpFields(data, lpPacket);
 
-  this->sendNetPacket(std::move(lpPacket), endpointId, false);
+  this->sendNetPacket(std::move(lpPacket), endpointId, false, data.getName());
 }
 
 void
@@ -121,7 +121,7 @@ VmacLinkService::doSendNack(const lp::Nack& nack, const EndpointId& endpointId)
 
   encodeLpFields(nack, lpPacket);
 
-  this->sendNetPacket(std::move(lpPacket), endpointId, false);
+  this->sendNetPacket(std::move(lpPacket), endpointId, false, Name());
 }
 
 void
@@ -158,8 +158,10 @@ VmacLinkService::encodeLpFields(const ndn::PacketBase& netPkt, lp::Packet& lpPac
 }
 
 void
-VmacLinkService::sendNetPacket(lp::Packet&& pkt, const EndpointId& endpointId, bool isInterest)
+VmacLinkService::sendNetPacket(lp::Packet&& pkt, const EndpointId& endpointId, bool isInterest, const Name name)
 {
+  NFD_LOG_INFO("Sending interest with name: " << name);
+
   std::vector<lp::Packet> frags;
   ssize_t mtu = this->getTransport()->getMtu();
 
@@ -210,7 +212,7 @@ VmacLinkService::sendNetPacket(lp::Packet&& pkt, const EndpointId& endpointId, b
   }
 
   for (lp::Packet& frag : frags) {
-    this->sendLpPacket(std::move(frag), endpointId);
+    this->sendLpPacket(std::move(frag), endpointId, name);
   }
 }
 

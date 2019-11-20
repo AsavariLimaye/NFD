@@ -64,12 +64,14 @@ VmacTransport::doClose()
 void
 VmacTransport::send(const Block& packet, const EndpointId& endpoint)
 {
-   this->send(packet, endpoint, Name());
+  NFD_LOG_INFO("VmacTransport Send 2 params");
+  this->send(packet, endpoint, Name());
 }
 
 void
 VmacTransport::send(const Block& packet, const EndpointId& endpoint, Name name)
 {
+  NFD_LOG_INFO("VmacTransport Send 2 params");
 
   BOOST_ASSERT(packet.isValid());
   BOOST_ASSERT(this->getMtu() == MTU_UNLIMITED ||
@@ -100,7 +102,8 @@ void
 VmacTransport::doSend(const Block& packet, const EndpointId& endpoint, const Name name)
 {
   NFD_LOG_FACE_TRACE(__func__);
-  NFD_LOG_INFO("Interest Name" << name);
+  NFD_LOG_INFO("Vmac Transport Interest Name" << name);
+  this->sendVmac(packet, name);
 }
 
 void
@@ -113,8 +116,9 @@ VmacTransport::initVmac()
 }
 
 void
-VmacTransport::sendVmac(const Block& packet)
+VmacTransport::sendVmac(const Block& packet, const Name name)
 {
+  NFD_LOG_INFO("Sending VMAC Frame with interest name " << name);
   send_vmac(0,0,0,"send_data",9,"send_interest",13);
 }
 

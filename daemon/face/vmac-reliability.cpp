@@ -292,7 +292,7 @@ VmacReliability::onLpPacketLost(lp::Sequence txSeq)
     deleteUnackedFrag(txSeqIt);
 
     // Retransmit fragment
-    m_linkService->sendLpPacket(lp::Packet(newTxFrag.pkt), 0);
+    m_linkService->sendLpPacket(lp::Packet(newTxFrag.pkt), 0, Name());
 
     // Start RTO timer for this sequence
     newTxFrag.rtoTimer = getScheduler().schedule(m_rttEst.getEstimatedRto(),

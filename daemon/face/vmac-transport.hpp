@@ -72,7 +72,7 @@ private:
 
 private:
   void initVmac();
-  void sendVmac(const Block& packet);
+  void sendVmac(const Block& packet, const Name name);
   void vmacCallback(uint8_t type,uint64_t enc, char* buff, uint16_t len, uint16_t seq, char* interestName, uint16_t interestNameLen);
 };
 
