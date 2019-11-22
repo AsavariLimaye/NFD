@@ -26,7 +26,7 @@
 #include "vmac-transport.hpp"
 #include "common/global.hpp"
 
-#include<vmac/vmac.h>
+#include <vmac/vmac.h>
 
 namespace nfd {
 namespace face {
@@ -71,7 +71,7 @@ VmacTransport::send(const Block& packet, const EndpointId& endpoint)
 void
 VmacTransport::send(const Block& packet, const EndpointId& endpoint, Name name)
 {
-  NFD_LOG_INFO("VmacTransport Send 2 params");
+  NFD_LOG_INFO("VmacTransport Send");
 
   BOOST_ASSERT(packet.isValid());
   BOOST_ASSERT(this->getMtu() == MTU_UNLIMITED ||
@@ -109,9 +109,9 @@ VmacTransport::doSend(const Block& packet, const EndpointId& endpoint, const Nam
 void
 VmacTransport::initVmac()
 {
-  void (*ptr) (uint8_t a, uint64_t b, char* c, uint16_t d, uint16_t e, char* f, uint16_t g) = &vmac_callback;
+  //void (*ptr) (uint8_t a, uint64_t b, char* c, uint16_t d, uint16_t e, char* f, uint16_t g) = &vmac_callback;
   //void (*ptr) (uint8_t a, uint64_t b, char* c, uint16_t d, uint16_t e, char* f, uint16_t g) = &vmacCallback;
-  vmac_register((void*) ptr);
+  //vmac_register((void*) ptr);
   NFD_LOG_INFO("Vmac Interface Initialized");
 }
 
@@ -119,7 +119,7 @@ void
 VmacTransport::sendVmac(const Block& packet, const Name name)
 {
   NFD_LOG_INFO("Sending VMAC Frame with interest name " << name);
-  send_vmac(0,0,0,"send_data",9,"send_interest",13);
+  //send_vmac(0,0,0,"send_data",9,"send_interest",13);
 }
 
 

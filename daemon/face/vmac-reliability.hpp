@@ -89,13 +89,13 @@ public:
    *  \param isInterest whether the network packet is an Interest
    */
   void
-  handleOutgoing(std::vector<lp::Packet>& frags, lp::Packet&& pkt, bool isInterest);
+  handleOutgoing(std::vector<lp::Packet>& frags, lp::Packet&& pkt, bool isInterest, const Name name);
 
   /** \brief extract and parse all Acks and add Ack for contained Fragment (if any) to AckQueue
    *  \param pkt incoming LpPacket
    */
   void
-  processIncomingPacket(const lp::Packet& pkt);
+  processIncomingPacket(const lp::Packet& pkt, Name name);
 
   /** \brief called by VmacLinkService to attach Acks onto an outgoing LpPacket
    *  \param pkt outgoing LpPacket to attach Acks to
@@ -139,7 +139,7 @@ PUBLIC_WITH_TESTS_ELSE_PRIVATE:
    *  \return vector of the TxSequences of fragments removed due to a network packet being removed
    */
   std::vector<lp::Sequence>
-  onLpPacketLost(lp::Sequence txSeq);
+  onLpPacketLost(lp::Sequence txSeq, const Name name);
 
   /** \brief remove the fragment with the given sequence number from the map of unacknowledged
    *         fragments, as well as its associated network packet (if any)

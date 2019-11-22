@@ -27,7 +27,6 @@
 #define NFD_DAEMON_FACE_VMAC_TRANSPORT_HPP
 
 #include "transport.hpp"
-// #include "vmac-interface.hpp"
 
 namespace nfd {
 namespace face {
@@ -55,11 +54,11 @@ public:
 
 protected:
   void
-  doClose() final;
+  doClose() OVERRIDE_WITH_TESTS_ELSE_FINAL;
 private:
 
   void
-  doSend(const Block& packet, const EndpointId& endpoint) final;
+  doSend(const Block& packet, const EndpointId& endpoint) OVERRIDE_WITH_TESTS_ELSE_FINAL;
 
   void
   doSend(const Block& packet, const EndpointId& endpoint, const Name name);
@@ -79,4 +78,4 @@ private:
 } // namespace face
 } // namespace nfd
 
-#endif // NFD_DAEMON_FACE_ETHERNET_TRANSPORT_HPP
+#endif // NFD_DAEMON_FACE_VMAC_TRANSPORT_HPP

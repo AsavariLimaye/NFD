@@ -48,7 +48,7 @@ VmacLinkService::VmacLinkService(const VmacLinkService::Options& options)
   , m_nextMarkTime(time::steady_clock::TimePoint::max())
   , m_nMarkedSinceInMarkingState(0)
 {
-  m_vmacTransport = (VmacTransport*) this->getTransport();
+  m_vmacTransport = static_cast<VmacTransport*> (this->getTransport());
   m_reassembler.beforeTimeout.connect([this] (auto...) { ++this->nReassemblyTimeouts; });
   m_reliability.onDroppedInterest.connect([this] (const auto& i) { this->notifyDroppedInterest(i); });
   nReassembling.observe(&m_reassembler);
@@ -208,7 +208,7 @@ VmacLinkService::sendNetPacket(lp::Packet&& pkt, const EndpointId& endpointId, b
   }
 
   if (m_options.reliabilityOptions.isEnabled && frags.front().has<lp::FragmentField>()) {
-    m_reliability.handleOutgoing(frags, std::move(pkt), isInterest);
+    m_reliability.handleOutgoing(frags, std::move(pkt), isInterest, name);
   }
 
   for (lp::Packet& frag : frags) {
@@ -280,7 +280,7 @@ VmacLinkService::doReceivePacket(const Block& packet, const EndpointId& endpoint
     lp::Packet pkt(packet);
 
     if (m_options.reliabilityOptions.isEnabled) {
-      m_reliability.processIncomingPacket(pkt);
+      m_reliability.processIncomingPacket(pkt, Name());
     }
 
     if (!pkt.has<lp::FragmentField>()) {

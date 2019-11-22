@@ -96,6 +96,9 @@ class VmacLinkService FINAL_UNLESS_WITH_TESTS : public LinkService
 
 protected:
   void
+  sendPacket(const Block& packet, const EndpointId& endpoint);
+
+  void
   sendPacket(const Block& packet, const EndpointId& endpoint, const Name name);
 
 public:
@@ -310,6 +313,12 @@ PUBLIC_WITH_TESTS_ELSE_PRIVATE:
 
   friend class VmacReliability;
 };
+
+inline void
+VmacLinkService::sendPacket(const Block& packet, const EndpointId& endpoint)
+{
+  m_vmacTransport->send(packet, endpoint, Name());
+}
 
 inline void
 VmacLinkService::sendPacket(const Block& packet, const EndpointId& endpoint, const Name name)
