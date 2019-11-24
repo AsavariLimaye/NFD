@@ -196,7 +196,8 @@ private: // lower interface to be overridden in subclass
   virtual void
   doReceivePacket(const Block& packet, const EndpointId& endpoint) = 0;
 
-private:
+//private:
+protected:
   Face* m_face;
   Transport* m_transport;
 };

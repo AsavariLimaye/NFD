@@ -102,6 +102,18 @@ protected:
   sendPacket(const Block& packet, const EndpointId& endpoint, const Name name);
 
 public:
+/*
+  void
+  setFaceAndTransport(Face& face, Transport& transport);
+
+  const Transport*
+  getTransport() const;
+
+  Transport*
+  getTransport();
+
+ */
+
   /** \brief Options that control the behavior of VmacLinkService
    */
   class Options
@@ -313,18 +325,21 @@ PUBLIC_WITH_TESTS_ELSE_PRIVATE:
 
   friend class VmacReliability;
 };
-
+/*
 inline void
 VmacLinkService::sendPacket(const Block& packet, const EndpointId& endpoint)
 {
-  m_vmacTransport->send(packet, endpoint, Name());
+  //BOOST_ASSERT(m_vmacTransport != nullptr);
+  //m_vmacTransport->send(packet, endpoint, Name());
 }
 
 inline void
 VmacLinkService::sendPacket(const Block& packet, const EndpointId& endpoint, const Name name)
 {
-  m_vmacTransport->send(packet, endpoint, name);
+  //BOOST_ASSERT(m_vmacTransport != nullptr);
+  //m_vmacTransport->send(packet, endpoint, name);
 }
+*/
 
 inline const VmacLinkService::Options&
 VmacLinkService::getOptions() const

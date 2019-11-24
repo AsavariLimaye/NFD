@@ -48,11 +48,37 @@ VmacLinkService::VmacLinkService(const VmacLinkService::Options& options)
   , m_nextMarkTime(time::steady_clock::TimePoint::max())
   , m_nMarkedSinceInMarkingState(0)
 {
-  m_vmacTransport = static_cast<VmacTransport*> (this->getTransport());
+  //m_transport = static_cast<VmacTransport*> (this->getTransport());
   m_reassembler.beforeTimeout.connect([this] (auto...) { ++this->nReassemblyTimeouts; });
   m_reliability.onDroppedInterest.connect([this] (const auto& i) { this->notifyDroppedInterest(i); });
   nReassembling.observe(&m_reassembler);
 }
+
+/*
+void
+VmacLinkService::setFaceAndTransport(Face& face, Transport& transport)
+{
+  BOOST_ASSERT(m_face == nullptr);
+  BOOST_ASSERT(m_transport == nullptr);
+  //BOOST_ASSERT(m_vmacTransport == nullptr);
+
+  m_face = &face;
+  m_vmacTransport = static_cast<VmacTransport*>(&transport);
+  //this->sendPacket(Block(), 0, Name());
+}
+
+inline const Transport*
+VmacLinkService::getTransport() const
+{
+	  return m_vmacTransport;
+}
+
+inline Transport*
+VmacLinkService::getTransport()
+{
+	  return m_vmacTransport;
+}
+*/
 
 void
 VmacLinkService::setOptions(const VmacLinkService::Options& options)
@@ -90,7 +116,7 @@ VmacLinkService::sendLpPacket(lp::Packet&& pkt, const EndpointId& endpointId, co
     NFD_LOG_FACE_WARN("attempted to send packet over MTU limit");
     return;
   }
-  this->sendPacket(block, endpointId, name);
+ //this->sendPacket(block, endpointId, name);
 }
 
 void
