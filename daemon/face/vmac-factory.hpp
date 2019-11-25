@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
- * Copyright (c) 2014-2019,  Regents of the University of California,
+ * Copyright (c) 2014-2018,  Regents of the University of California,
  *                           Arizona Board of Regents,
  *                           Colorado State University,
  *                           University Pierre & Marie Curie, Sorbonne University,
@@ -23,57 +23,40 @@
  * NFD, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NFD_DAEMON_FACE_VMAC_TRANSPORT_HPP
-#define NFD_DAEMON_FACE_VMAC_TRANSPORT_HPP
+#ifndef NFD_DAEMON_FACE_VMAC_FACTORY_HPP
+#define NFD_DAEMON_FACE_VMAC_FACTORY_HPP
 
-#include "transport.hpp"
-#include <boost/signals2.hpp>
+#include "protocol-factory.hpp"
 
 namespace nfd {
 namespace face {
 
-/**
- * @brief Cass for Vmac Transport
+/** \brief Protocol factory for Vmac
  */
-class VmacTransport : public Transport
+class VmacFactory : public ProtocolFactory
 {
 public:
-	
-  class Error : public std::runtime_error
-  {
-  public:
-    using std::runtime_error::runtime_error;
-  };
+  static const std::string&
+  getId() noexcept;
 
-  VmacTransport();
+  explicit
+  VmacFactory(const CtorParams& params);
 
-protected:
-  void
-  doClose() OVERRIDE_WITH_TESTS_ELSE_FINAL;
+  shared_ptr<Face>
+  createMulticastFace();
+
 private:
-
-  void
-  doSend(const Block& packet, const EndpointId& endpoint) OVERRIDE_WITH_TESTS_ELSE_FINAL;
-
-  void
-  doSend(const Block& packet, const Name name, const EndpointId& endpoint) OVERRIDE_WITH_TESTS_ELSE_FINAL;
-
-  /**
-   * @brief Sends the specified TLV block on the network wrapped in an VMAC frame
+  /** \brief process face_system.vmac config section
    */
   void
-  handleError(const std::string& errorMessage);
-
-public:
-  static boost::signals2::signal<void (uint8_t type,uint64_t enc, char* buff, uint16_t len, uint16_t seq, char* interestName, uint16_t interestNameLen)> m_signal;
-
-private:
-  void initVmac();
-  void sendVmac(const Block& packet, const Name name);
-  void vmacCallback(uint8_t type,uint64_t enc, char* buff, uint16_t len, uint16_t seq, char* interestName, uint16_t interestNameLen);
+  doProcessConfig(OptionalConfigSection configSection,
+                  FaceSystem::ConfigContext& context) override;
+  
+  std::map<std::string, shared_ptr<Face>> m_mcastFaces;
 };
-
 
 } // namespace face
 } // namespace nfd
-#endif // NFD_DAEMON_FACE_VMAC_TRANSPORT_HPP
+
+#endif // NFD_DAEMON_FACE_VMAC_FACTORY_HPP
+

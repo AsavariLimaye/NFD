@@ -31,11 +31,14 @@
 namespace nfd {
 namespace face {
 
+boost::signals2::signal<void (uint8_t type,uint64_t enc, char* buff, uint16_t len, uint16_t seq, char* interestName, uint16_t interestNameLen)> VmacTransport::m_signal;
+
 NFD_LOG_INIT(VmacTransport);
 
 void vmac_callback(uint8_t type,uint64_t enc, char* buff, uint16_t len, uint16_t seq, char* interestName, uint16_t interestNameLen)
 {
   NFD_LOG_INFO("Type: " << type << "  Name: " << interestName << "  Data: " << buff);
+  VmacTransport::m_signal(type, enc, buff, len, seq, interestName, interestNameLen);
 }
 
 VmacTransport::VmacTransport()
@@ -79,9 +82,10 @@ VmacTransport::doSend(const Block& packet, const Name name, const EndpointId& en
 void
 VmacTransport::initVmac()
 {
-  //void (*ptr) (uint8_t a, uint64_t b, char* c, uint16_t d, uint16_t e, char* f, uint16_t g) = &vmac_callback;
-  //void (*ptr) (uint8_t a, uint64_t b, char* c, uint16_t d, uint16_t e, char* f, uint16_t g) = &vmacCallback;
-  //vmac_register((void*) ptr);
+  void (*ptr) (uint8_t a, uint64_t b, char* c, uint16_t d, uint16_t e, char* f, uint16_t g) = &vmac_callback;
+  //void (*ptr) (uint8_t a, uint64_t b, char* c, uint16_t d, uint16_t e, char* f, uint16_t g) = std::bind(&VmacTransport::vmacCallback, this, _1, _2, _3, _4, _5, _6, _7);
+  VmacTransport::m_signal.connect(boost::bind(&VmacTransport::vmacCallback, this, _1, _2, _3, _4, _5, _6, _7));
+  vmac_register((void*) ptr);
   NFD_LOG_INFO("Vmac Interface Initialized");
 }
 
@@ -89,13 +93,13 @@ void
 VmacTransport::sendVmac(const Block& packet, const Name name)
 {
   NFD_LOG_INFO("Sending VMAC Frame with interest name " << name);
-  //send_vmac(0,0,0,"send_data",9,"send_interest",13);
+  send_vmac(0,0,0,"send_data",9,"send_interest",13);
 }
 
 
 void
 VmacTransport::vmacCallback(uint8_t type,uint64_t enc, char* buff, uint16_t len, uint16_t seq, char* interestName, uint16_t interestNameLen) {
-  NFD_LOG_INFO("Type: " << type << "  Name: " << interestName << "  Data: " << buff);
+  NFD_LOG_INFO("Inside Class Callback Called: Type: " << type << "  Name: " << interestName << "  Data: " << buff);
 }
 
 void
