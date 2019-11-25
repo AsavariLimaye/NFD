@@ -54,6 +54,11 @@ private:
   doSend(const Block&, const EndpointId&) OVERRIDE_WITH_TESTS_ELSE_FINAL
   {
   }
+
+  void
+  doSend(const Block&, const Name, const EndpointId&) OVERRIDE_WITH_TESTS_ELSE_FINAL
+  {
+  }
 };
 
 } // namespace face

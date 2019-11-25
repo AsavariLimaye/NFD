@@ -172,6 +172,9 @@ protected: // lower interface to be invoked in subclass (send path termination)
   void
   sendPacket(const Block& packet, const EndpointId& endpoint);
 
+  void
+  sendPacket(const Block& packet, const Name name, const EndpointId& endpoint);
+
 protected:
   void
   notifyDroppedInterest(const Interest& packet);
@@ -235,6 +238,12 @@ inline void
 LinkService::sendPacket(const Block& packet, const EndpointId& endpoint)
 {
   m_transport->send(packet, endpoint);
+}
+
+inline void
+LinkService::sendPacket(const Block& packet, const Name name, const EndpointId& endpoint)
+{
+  m_transport->send(packet, name, endpoint);
 }
 
 std::ostream&

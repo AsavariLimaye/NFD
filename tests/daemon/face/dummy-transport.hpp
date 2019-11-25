@@ -106,6 +106,12 @@ private:
     sentPackets.push_back({packet, endpoint});
   }
 
+  void
+  doSend(const Block& packet, const Name name, const EndpointId& endpoint) override
+  {
+    sentPackets.push_back({packet, endpoint});
+  }
+
 public:
   std::vector<ndn::nfd::FacePersistency> persistencyHistory;
   std::vector<TxPacket> sentPackets;

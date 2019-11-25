@@ -172,6 +172,9 @@ public: // upper interface
   void
   send(const Block& packet, const EndpointId& endpoint = 0);
 
+  void
+  send(const Block& packet, const Name name, const EndpointId& endpoint = 0);
+
 public: // static properties
   /** \return a FaceUri representing local endpoint
    */
@@ -339,6 +342,8 @@ private: // to be overridden by subclass
   virtual void
   doSend(const Block& packet, const EndpointId& endpoint) = 0;
 
+  virtual void
+  doSend(const Block& packet, const Name name, const EndpointId& endpoint);
 public:
   /** \brief minimum MTU that may be set on a transport
    *

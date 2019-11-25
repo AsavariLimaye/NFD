@@ -111,6 +111,28 @@ Transport::send(const Block& packet, const EndpointId& endpoint)
   this->doSend(packet, endpoint);
 }
 
+
+void
+Transport::send(const Block& packet, const Name name, const EndpointId& endpoint)
+{
+  BOOST_ASSERT(packet.isValid());
+  BOOST_ASSERT(this->getMtu() == MTU_UNLIMITED ||
+               packet.size() <= static_cast<size_t>(this->getMtu()));
+
+  TransportState state = this->getState();
+  if (state != TransportState::UP && state != TransportState::DOWN) {
+    NFD_LOG_FACE_TRACE("send ignored in " << state << " state");
+    return;
+  }
+
+  if (state == TransportState::UP) {
+    ++this->nOutPackets;
+    this->nOutBytes += packet.size();
+  }
+
+  this->doSend(packet, name, endpoint);
+}
+
 void
 Transport::receive(const Block& packet, const EndpointId& endpoint)
 {
@@ -166,6 +188,11 @@ Transport::setPersistency(ndn::nfd::FacePersistency newPersistency)
 
 void
 Transport::afterChangePersistency(ndn::nfd::FacePersistency oldPersistency)
+{
+}
+
+void
+Transport::doSend(const Block& packet, const Name name, const EndpointId& endpoint)
 {
 }
 
