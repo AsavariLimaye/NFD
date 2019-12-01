@@ -93,13 +93,36 @@ void
 VmacTransport::sendVmac(const Block& packet, const Name name)
 {
   NFD_LOG_INFO("Sending VMAC Frame with interest name " << name);
-  send_vmac(0,0,0,"send_data",9,"send_interest",13);
-}
 
+  ndn::EncodingBuffer enc_buffer(packet);
+  size_t buff_len = enc_buffer.size();
+  size_t interest_len = name.toUri().length();
+  
+  char buffptr[buff_len + 1];
+  char interest_name[interest_len + 1];
+
+  strncpy(buffptr, (char*) enc_buffer.buf(), buff_len);
+  strncpy(interest_name, name.toUri().c_str(), interest_len);
+
+  send_vmac(0, 0, 0, (char*) buffptr, (uint16_t) buff_len, (char*) interest_name, (uint16_t) interest_len);
+  //send_vmac(0,0,0,"send_data",9,"send_interest",13);
+}
 
 void
 VmacTransport::vmacCallback(uint8_t type,uint64_t enc, char* buff, uint16_t len, uint16_t seq, char* interestName, uint16_t interestNameLen) {
-  NFD_LOG_INFO("Inside Class Callback Called: Type: " << type << "  Name: " << interestName << "  Data: " << buff);
+  NFD_LOG_INFO("Inside Class Callback");
+  if (interestName != NULL)
+    NFD_LOG_INFO("Type: " << type << "  Name: " << interestName);
+  else  
+    NFD_LOG_INFO("Type: " << type);
+  // check if received length is more than MAX size
+  uint8_t* receiveBuffer = (uint8_t*) buff;
+  bool done = false;
+  Block recv_block;
+  std::tie(done, recv_block) = Block::fromBuffer(receiveBuffer, (size_t)len);
+  if (done)
+  	this->receive(recv_block);
+  NFD_LOG_INFO("Error getting block from buffer");
 }
 
 void
