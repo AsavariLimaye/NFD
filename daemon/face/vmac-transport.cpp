@@ -41,7 +41,7 @@ void vmac_callback(uint8_t type,uint64_t enc, char* buff, uint16_t len, uint16_t
   VmacTransport::m_signal(type, enc, buff, len, seq, interestName, interestNameLen);
 }
 
-VmacTransport::VmacTransport()
+VmacTransport::VmacTransport(ssize_t mtu)
 {
   initVmac();
   this->setLocalUri(FaceUri("vmac://local"));
@@ -49,7 +49,7 @@ VmacTransport::VmacTransport()
   this->setScope(ndn::nfd::FACE_SCOPE_NON_LOCAL);
   this->setPersistency(ndn::nfd::FACE_PERSISTENCY_PERMANENT);
   this->setLinkType(ndn::nfd::LINK_TYPE_MULTI_ACCESS);
-  this->setMtu(MTU_UNLIMITED);
+  this->setMtu(mtu);
 }
 
 void

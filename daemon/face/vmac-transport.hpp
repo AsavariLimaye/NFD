@@ -45,7 +45,7 @@ public:
     using std::runtime_error::runtime_error;
   };
 
-  VmacTransport();
+  VmacTransport(ssize_t mtu);
 
 protected:
   void

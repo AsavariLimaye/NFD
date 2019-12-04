@@ -59,11 +59,11 @@ protected:
 
   void
   initialize(const VmacLinkService::Options& options,
-             ssize_t mtu = MTU_UNLIMITED,
+             ssize_t mtu = 1500,
              ssize_t sendQueueCapacity = QUEUE_UNSUPPORTED)
   {
     face = make_unique<Face>(make_unique<VmacLinkService>(options),
-                             make_unique<VmacTransport>());
+                             make_unique<VmacTransport>(mtu));
 		    /*
                              make_unique<DummyTransport>("dummy://", "dummy://",
                                                          ndn::nfd::FACE_SCOPE_NON_LOCAL,

@@ -43,15 +43,6 @@ VmacFactory::getId() noexcept
 VmacFactory::VmacFactory(const CtorParams& params)
   : ProtocolFactory(params)
 {
-  NFD_LOG_INFO("Creating multicast vmac face");
-
-  shared_ptr<Face> face;
-  face = this->createMulticastFace();
-
-  if (face->getId() == face::INVALID_FACEID) {
-    // new face: register with forwarding
-    this->addFace(face);
-  }
 }
 
 void
@@ -65,17 +56,27 @@ VmacFactory::doProcessConfig(OptionalConfigSection configSection,
       const std::string& key = pair.first;
       const ConfigSection& value = pair.second;
 
-      if (key == "vmackey") {
-        
+      if (key == "MTU") {
+        m_vmacConfig.mtu = ConfigFile::parseNumber<ssize_t>(pair, "face_system.vmac.MTU");
       }
       else {
-        NDN_THROW(ConfigFile::Error("Unrecognized option face_system.ether." + key));
+        NDN_THROW(ConfigFile::Error("Unrecognized option face_system.vmac." + key));
       }
     }
   }
 
   if (context.isDryRun) {
     return;
+  }
+
+  NFD_LOG_INFO("Creating multicast vmac face");
+
+  shared_ptr<Face> face;
+  face = this->createMulticastFace();
+
+  if (face->getId() == face::INVALID_FACEID) {
+    // new face: register with forwarding
+    this->addFace(face);
   }
 
 }
@@ -87,9 +88,10 @@ VmacFactory::createMulticastFace()
   VmacLinkService::Options opts;
   opts.allowFragmentation = true;
   opts.allowReassembly = true;
+  NFD_LOG_INFO("vmac mtu = " << m_vmacConfig.mtu);
 
   auto linkService = make_unique<VmacLinkService>(opts);
-  auto transport = make_unique<VmacTransport>();
+  auto transport = make_unique<VmacTransport>(m_vmacConfig.mtu);
   auto face = make_shared<Face>(std::move(linkService), std::move(transport));
 
   m_mcastFaces[key] = face;

@@ -51,7 +51,12 @@ private:
   void
   doProcessConfig(OptionalConfigSection configSection,
                   FaceSystem::ConfigContext& context) override;
-  
+
+  struct VmacConfig
+    {
+      ssize_t mtu = 1500;
+    };
+  VmacConfig m_vmacConfig;
   std::map<std::string, shared_ptr<Face>> m_mcastFaces;
 };
 
