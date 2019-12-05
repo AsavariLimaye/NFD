@@ -388,7 +388,7 @@ VmacLinkService::decodeInterest(const Block& netPkt, const lp::Packet& firstPkt,
   if (firstPkt.has<lp::PitTokenField>()) {
     interest->setTag(make_shared<lp::PitToken>(firstPkt.get<lp::PitTokenField>()));
   }
-
+  NFD_LOG_INFO("Received an interest");
   this->receiveInterest(*interest, endpointId);
 }
 

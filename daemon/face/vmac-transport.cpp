@@ -37,6 +37,7 @@ NFD_LOG_INIT(VmacTransport);
 
 void vmac_callback(uint8_t type,uint64_t enc, char* buff, uint16_t len, uint16_t seq, char* interestName, uint16_t interestNameLen)
 {
+  printf("vma_callback: Type: %d, len: %d\n\n", type, len);
   NFD_LOG_INFO("Type: " << type << "  Name: " << interestName << "  Data: " << buff);
   VmacTransport::m_signal(type, enc, buff, len, seq, interestName, interestNameLen);
 }
@@ -120,9 +121,12 @@ VmacTransport::vmacCallback(uint8_t type,uint64_t enc, char* buff, uint16_t len,
   bool done = false;
   Block recv_block;
   std::tie(done, recv_block) = Block::fromBuffer(receiveBuffer, (size_t)len);
-  if (done)
+  if (done) {
   	this->receive(recv_block);
-  NFD_LOG_INFO("Error getting block from buffer");
+    NFD_LOG_INFO("Received block");
+  }
+  else
+    NFD_LOG_INFO("Error getting block from buffer");
 }
 
 void
