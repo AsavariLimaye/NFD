@@ -107,7 +107,7 @@ private:
   }
 
   void
-  doSend(const Block& packet, const Name name, const EndpointId& endpoint) override
+  doSend(const Block& packet, const Name name, const TransportFrameType type, const EndpointId& endpoint) override
   {
     sentPackets.push_back({packet, endpoint});
   }

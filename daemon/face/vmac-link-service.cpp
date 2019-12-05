@@ -67,11 +67,11 @@ VmacLinkService::requestIdlePacket(const EndpointId& endpointId)
 {
   // No need to request Acks to attach to this packet from LpReliability, as they are already
   // attached in sendLpPacket
-  this->sendLpPacket({}, Name(), endpointId);
+  this->sendLpPacket({}, Name(), TransportFrameType::ANNOUNCEMENT, endpointId);
 }
 
 void
-VmacLinkService::sendLpPacket(lp::Packet&& pkt, const Name name, const EndpointId& endpointId)
+VmacLinkService::sendLpPacket(lp::Packet&& pkt, const Name name, const TransportFrameType type, const EndpointId& endpointId)
 {
   const ssize_t mtu = this->getTransport()->getMtu();
 
@@ -89,7 +89,7 @@ VmacLinkService::sendLpPacket(lp::Packet&& pkt, const Name name, const EndpointI
     NFD_LOG_FACE_WARN("attempted to send packet over MTU limit");
     return;
   }
-  this->sendPacket(block, name, endpointId);
+  this->sendPacket(block, name, type, endpointId);
 }
 
 void
@@ -99,7 +99,7 @@ VmacLinkService::doSendInterest(const Interest& interest, const EndpointId& endp
 
   encodeLpFields(interest, lpPacket);
 
-  this->sendNetPacket(std::move(lpPacket), endpointId, true, interest.getName());
+  this->sendNetPacket(std::move(lpPacket), interest.getName(), TransportFrameType::INTEREST, endpointId, true);
 }
 
 void
@@ -109,7 +109,7 @@ VmacLinkService::doSendData(const Data& data, const EndpointId& endpointId)
 
   encodeLpFields(data, lpPacket);
 
-  this->sendNetPacket(std::move(lpPacket), endpointId, false, data.getName());
+  this->sendNetPacket(std::move(lpPacket), data.getName(), TransportFrameType::DATA, endpointId, false);
 }
 
 void
@@ -120,7 +120,7 @@ VmacLinkService::doSendNack(const lp::Nack& nack, const EndpointId& endpointId)
 
   encodeLpFields(nack, lpPacket);
 
-  this->sendNetPacket(std::move(lpPacket), endpointId, false, Name());
+  this->sendNetPacket(std::move(lpPacket), nack.getInterest().getName(), TransportFrameType::NACK, endpointId, false);
 }
 
 void
@@ -157,7 +157,7 @@ VmacLinkService::encodeLpFields(const ndn::PacketBase& netPkt, lp::Packet& lpPac
 }
 
 void
-VmacLinkService::sendNetPacket(lp::Packet&& pkt, const EndpointId& endpointId, bool isInterest, const Name name)
+VmacLinkService::sendNetPacket(lp::Packet&& pkt, const Name name, const TransportFrameType type, const EndpointId& endpointId, bool isInterest)
 {
   NFD_LOG_DEBUG("Sending interest with name: " << name);
 
@@ -207,11 +207,11 @@ VmacLinkService::sendNetPacket(lp::Packet&& pkt, const EndpointId& endpointId, b
   }
 
   if (m_options.reliabilityOptions.isEnabled && frags.front().has<lp::FragmentField>()) {
-    m_reliability.handleOutgoing(frags, std::move(pkt), isInterest, name);
+    m_reliability.handleOutgoing(frags, std::move(pkt), isInterest, name, type);
   }
 
   for (lp::Packet& frag : frags) {
-    this->sendLpPacket(std::move(frag), name, endpointId);
+    this->sendLpPacket(std::move(frag), name, type, endpointId);
   }
 }
 
@@ -279,7 +279,7 @@ VmacLinkService::doReceivePacket(const Block& packet, const EndpointId& endpoint
     lp::Packet pkt(packet);
 
     if (m_options.reliabilityOptions.isEnabled) {
-      m_reliability.processIncomingPacket(pkt, Name());
+      m_reliability.processIncomingPacket(pkt, Name(), TransportFrameType::ANNOUNCEMENT);
     }
 
     if (!pkt.has<lp::FragmentField>()) {

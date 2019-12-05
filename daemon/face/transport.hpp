@@ -43,6 +43,15 @@ enum class TransportState {
   CLOSED ///< the transport is closed, and can be safely deallocated
 };
 
+/** \brief Indicates the type of frame being sent.
+ */
+enum class TransportFrameType {
+  INTEREST,
+  DATA,
+  NACK,
+  ANNOUNCEMENT
+};
+
 std::ostream&
 operator<<(std::ostream& os, TransportState state);
 
@@ -173,7 +182,7 @@ public: // upper interface
   send(const Block& packet, const EndpointId& endpoint = 0);
 
   void
-  send(const Block& packet, const Name name, const EndpointId& endpoint = 0);
+  send(const Block& packet, const Name name, const TransportFrameType type, const EndpointId& endpoint = 0);
 
 public: // static properties
   /** \return a FaceUri representing local endpoint
@@ -343,7 +352,7 @@ private: // to be overridden by subclass
   doSend(const Block& packet, const EndpointId& endpoint) = 0;
 
   virtual void
-  doSend(const Block& packet, const Name name, const EndpointId& endpoint) {};
+  doSend(const Block& packet, const Name name, const TransportFrameType type, const EndpointId& endpoint) {};
 public:
   /** \brief minimum MTU that may be set on a transport
    *

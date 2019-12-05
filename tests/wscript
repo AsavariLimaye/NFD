@@ -59,7 +59,7 @@ def build(bld):
             if bld.env.HAVE_LIBPCAP:
                 src += node.ant_glob('face/*ethernet*.cpp')
                 src += node.ant_glob('face/pcap*.cpp')
-            if bld.env.HAVE_VMAC:
+            if bld.env.HAVE_LIBVMAC:
                 src += node.ant_glob('face/*vmac*.cpp')
             if bld.env.HAVE_UNIX_SOCKETS:
                 src += node.ant_glob('face/unix*.cpp')

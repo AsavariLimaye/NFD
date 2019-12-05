@@ -112,7 +112,7 @@ Transport::send(const Block& packet, const EndpointId& endpoint)
 }
 
 void
-Transport::send(const Block& packet, const Name name, const EndpointId& endpoint)
+Transport::send(const Block& packet, const Name name, const TransportFrameType type, const EndpointId& endpoint)
 {
   BOOST_ASSERT(packet.isValid());
   BOOST_ASSERT(this->getMtu() == MTU_UNLIMITED ||
@@ -129,7 +129,7 @@ Transport::send(const Block& packet, const Name name, const EndpointId& endpoint
     this->nOutBytes += packet.size();
   }
 
-  this->doSend(packet, name, endpoint);
+  this->doSend(packet, name, type, endpoint);
 }
 
 void

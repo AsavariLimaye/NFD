@@ -56,7 +56,7 @@ private:
   }
 
   void
-  doSend(const Block&, const Name, const EndpointId&) OVERRIDE_WITH_TESTS_ELSE_FINAL
+  doSend(const Block&, const Name, const TransportFrameType type, const EndpointId&) OVERRIDE_WITH_TESTS_ELSE_FINAL
   {
   }
 };

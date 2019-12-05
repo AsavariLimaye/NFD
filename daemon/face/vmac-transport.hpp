@@ -56,7 +56,7 @@ private:
   doSend(const Block& packet, const EndpointId& endpoint) OVERRIDE_WITH_TESTS_ELSE_FINAL;
 
   void
-  doSend(const Block& packet, const Name name, const EndpointId& endpoint) OVERRIDE_WITH_TESTS_ELSE_FINAL;
+  doSend(const Block& packet, const Name name, const TransportFrameType type, const EndpointId& endpoint) OVERRIDE_WITH_TESTS_ELSE_FINAL;
 
   /**
    * @brief Sends the specified TLV block on the network wrapped in an VMAC frame
@@ -69,7 +69,8 @@ public:
 
 private:
   void initVmac();
-  void sendVmac(const Block& packet, const Name name);
+  void sendVmac(const Block& packet, const Name name, const TransportFrameType type);
+  uint8_t getVmacType(TransportFrameType type);
   void vmacCallback(uint8_t type,uint64_t enc, char* buff, uint16_t len, uint16_t seq, char* interestName, uint16_t interestNameLen);
 };
 

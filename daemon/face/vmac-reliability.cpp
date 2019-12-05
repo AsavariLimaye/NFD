@@ -60,7 +60,7 @@ VmacReliability::getLinkService() const
 }
 
 void
-VmacReliability::handleOutgoing(std::vector<lp::Packet>& frags, lp::Packet&& pkt, bool isInterest, Name name)
+VmacReliability::handleOutgoing(std::vector<lp::Packet>& frags, lp::Packet&& pkt, bool isInterest, Name name, TransportFrameType type)
 {
   BOOST_ASSERT(m_options.isEnabled);
 
@@ -81,7 +81,7 @@ VmacReliability::handleOutgoing(std::vector<lp::Packet>& frags, lp::Packet&& pkt
                                                  std::forward_as_tuple(frag));
     unackedFragsIt->second.sendTime = sendTime;
     unackedFragsIt->second.rtoTimer = getScheduler().schedule(m_rttEst.getEstimatedRto(),
-                                                              [=] { onLpPacketLost(txSeq, name); });
+                                                              [=] { onLpPacketLost(txSeq, name, type); });
     unackedFragsIt->second.netPkt = netPkt;
 
     if (m_unackedFrags.size() == 1) {
@@ -94,7 +94,7 @@ VmacReliability::handleOutgoing(std::vector<lp::Packet>& frags, lp::Packet&& pkt
 }
 
 void
-VmacReliability::processIncomingPacket(const lp::Packet& pkt, Name name)
+VmacReliability::processIncomingPacket(const lp::Packet& pkt, Name name, TransportFrameType type)
 {
   BOOST_ASSERT(m_options.isEnabled);
 
@@ -135,7 +135,7 @@ VmacReliability::processIncomingPacket(const lp::Packet& pkt, Name name)
     // Resend or fail fragments considered lost. Potentially increment the start of the window.
     for (lp::Sequence txSeq : lostLpPackets) {
       if (removedLpPackets.find(txSeq) == removedLpPackets.end()) {
-        auto removedThisTxSeq = onLpPacketLost(txSeq, name);
+        auto removedThisTxSeq = onLpPacketLost(txSeq, name, type);
         for (auto removedTxSeq : removedThisTxSeq) {
           removedLpPackets.insert(removedTxSeq);
         }
@@ -232,7 +232,7 @@ VmacReliability::findLostLpPackets(VmacReliability::UnackedFrags::iterator ackIt
 }
 
 std::vector<lp::Sequence>
-VmacReliability::onLpPacketLost(lp::Sequence txSeq, Name name)
+VmacReliability::onLpPacketLost(lp::Sequence txSeq, Name name, TransportFrameType type)
 {
   BOOST_ASSERT(m_unackedFrags.count(txSeq) > 0);
   auto txSeqIt = m_unackedFrags.find(txSeq);
@@ -292,11 +292,11 @@ VmacReliability::onLpPacketLost(lp::Sequence txSeq, Name name)
     deleteUnackedFrag(txSeqIt);
 
     // Retransmit fragment
-    m_linkService->sendLpPacket(lp::Packet(newTxFrag.pkt), name, 0);
+    m_linkService->sendLpPacket(lp::Packet(newTxFrag.pkt), name, type, 0);
 
     // Start RTO timer for this sequence
     newTxFrag.rtoTimer = getScheduler().schedule(m_rttEst.getEstimatedRto(),
-                                                 [=] { onLpPacketLost(newTxSeq, name); });
+                                                 [=] { onLpPacketLost(newTxSeq, name, type); });
   }
 
   return removedThisTxSeq;

@@ -73,15 +73,18 @@ void
 VmacTransport::doSend(const Block& packet, const EndpointId& endpoint)
 {
   NFD_LOG_FACE_TRACE(__func__);
+  NFD_LOG_ERROR("Called VMAC doSend without Name and Type");
+  /*
   this->doSend(packet, Name(), endpoint);
+  */
 }
 
 void
-VmacTransport::doSend(const Block& packet, const Name name, const EndpointId& endpoint)
+VmacTransport::doSend(const Block& packet, const Name name, const TransportFrameType type, const EndpointId& endpoint)
 {
   NFD_LOG_FACE_TRACE(__func__);
   NFD_LOG_DEBUG("Sending interest with name" << name);
-  this->sendVmac(packet, name);
+  this->sendVmac(packet, name, type);
 }
 
 void
@@ -94,7 +97,7 @@ VmacTransport::initVmac()
 }
 
 void
-VmacTransport::sendVmac(const Block& packet, const Name name)
+VmacTransport::sendVmac(const Block& packet, const Name name, const TransportFrameType type)
 {
   ndn::EncodingBuffer enc_buffer(packet);
   size_t buff_len = enc_buffer.size();
@@ -106,8 +109,20 @@ VmacTransport::sendVmac(const Block& packet, const Name name)
   strncpy(buffptr, (char*) enc_buffer.buf(), buff_len);
   strncpy(interest_name, name.toUri().c_str(), interest_len);
 
+  uint8_t send_type = getVmacType(type);
+
   NFD_LOG_DEBUG("Sending vmac frame with interest name: " << name << " data length: " << buff_len);
-  send_vmac(0, 0, 0, (char*) buffptr, (uint16_t) buff_len, (char*) interest_name, (uint16_t) interest_len);
+  send_vmac(send_type, 0, 0, (char*) buffptr, (uint16_t) buff_len, (char*) interest_name, (uint16_t) interest_len);
+}
+
+uint8_t
+VmacTransport::getVmacType(TransportFrameType type) {
+  if (type == TransportFrameType::INTEREST || type == TransportFrameType::NACK)
+    return 0;
+  if (type == TransportFrameType::DATA)
+    return 1;
+  if (type == TransportFrameType::ANNOUNCEMENT)
+    return 4;
 }
 
 void
