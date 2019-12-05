@@ -54,7 +54,7 @@ private:
 
   struct VmacConfig
     {
-      ssize_t mtu = 1500;
+      ssize_t mtu = 2000;
     };
   VmacConfig m_vmacConfig;
   std::map<std::string, shared_ptr<Face>> m_mcastFaces;
@@ -64,4 +64,3 @@ private:
 } // namespace nfd
 
 #endif // NFD_DAEMON_FACE_VMAC_FACTORY_HPP
-

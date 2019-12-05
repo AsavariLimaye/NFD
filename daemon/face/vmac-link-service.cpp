@@ -159,7 +159,7 @@ VmacLinkService::encodeLpFields(const ndn::PacketBase& netPkt, lp::Packet& lpPac
 void
 VmacLinkService::sendNetPacket(lp::Packet&& pkt, const EndpointId& endpointId, bool isInterest, const Name name)
 {
-  NFD_LOG_INFO("Sending interest with name: " << name);
+  NFD_LOG_DEBUG("Sending interest with name: " << name);
 
   std::vector<lp::Packet> frags;
   ssize_t mtu = this->getTransport()->getMtu();
@@ -388,7 +388,7 @@ VmacLinkService::decodeInterest(const Block& netPkt, const lp::Packet& firstPkt,
   if (firstPkt.has<lp::PitTokenField>()) {
     interest->setTag(make_shared<lp::PitToken>(firstPkt.get<lp::PitTokenField>()));
   }
-  NFD_LOG_INFO("Received an interest");
+
   this->receiveInterest(*interest, endpointId);
 }
 

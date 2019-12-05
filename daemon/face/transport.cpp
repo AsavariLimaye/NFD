@@ -111,7 +111,6 @@ Transport::send(const Block& packet, const EndpointId& endpoint)
   this->doSend(packet, endpoint);
 }
 
-
 void
 Transport::send(const Block& packet, const Name name, const EndpointId& endpoint)
 {
@@ -188,11 +187,6 @@ Transport::setPersistency(ndn::nfd::FacePersistency newPersistency)
 
 void
 Transport::afterChangePersistency(ndn::nfd::FacePersistency oldPersistency)
-{
-}
-
-void
-Transport::doSend(const Block& packet, const Name name, const EndpointId& endpoint)
 {
 }
 

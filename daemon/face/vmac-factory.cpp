@@ -69,7 +69,7 @@ VmacFactory::doProcessConfig(OptionalConfigSection configSection,
     return;
   }
 
-  NFD_LOG_INFO("Creating multicast vmac face");
+  NFD_LOG_DEBUG("Creating multicast vmac face");
 
   shared_ptr<Face> face;
   face = this->createMulticastFace();
@@ -88,7 +88,7 @@ VmacFactory::createMulticastFace()
   VmacLinkService::Options opts;
   opts.allowFragmentation = true;
   opts.allowReassembly = true;
-  NFD_LOG_INFO("vmac mtu = " << m_vmacConfig.mtu);
+  NFD_LOG_DEBUG("vmac mtu = " << m_vmacConfig.mtu);
 
   auto linkService = make_unique<VmacLinkService>(opts);
   auto transport = make_unique<VmacTransport>(m_vmacConfig.mtu);

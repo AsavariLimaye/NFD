@@ -52,12 +52,15 @@ def build(bld):
             subdir = 'daemon/rib' if module == 'rib' else module
             node = bld.path.find_dir(subdir)
             src = node.ant_glob('**/*.cpp', excl=['face/*ethernet*.cpp',
+						  'face/*vmac*.cpp',
                                                   'face/pcap*.cpp',
                                                   'face/unix*.cpp',
                                                   'face/websocket*.cpp'])
             if bld.env.HAVE_LIBPCAP:
                 src += node.ant_glob('face/*ethernet*.cpp')
                 src += node.ant_glob('face/pcap*.cpp')
+            if bld.env.HAVE_VMAC:
+                src += node.ant_glob('face/*vmac*.cpp')
             if bld.env.HAVE_UNIX_SOCKETS:
                 src += node.ant_glob('face/unix*.cpp')
             if bld.env.HAVE_WEBSOCKET:

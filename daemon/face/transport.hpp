@@ -343,7 +343,7 @@ private: // to be overridden by subclass
   doSend(const Block& packet, const EndpointId& endpoint) = 0;
 
   virtual void
-  doSend(const Block& packet, const Name name, const EndpointId& endpoint);
+  doSend(const Block& packet, const Name name, const EndpointId& endpoint) {};
 public:
   /** \brief minimum MTU that may be set on a transport
    *
