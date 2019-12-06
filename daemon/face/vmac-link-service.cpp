@@ -67,7 +67,7 @@ VmacLinkService::requestIdlePacket(const EndpointId& endpointId)
 {
   // No need to request Acks to attach to this packet from LpReliability, as they are already
   // attached in sendLpPacket
-  this->sendLpPacket({}, Name(), TransportFrameType::ANNOUNCEMENT, endpointId);
+  this->sendLpPacket({}, Name(), TransportFrameType::INTEREST, endpointId);
 }
 
 void
