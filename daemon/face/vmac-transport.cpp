@@ -111,7 +111,9 @@ VmacTransport::sendVmac(const Block& packet, const Name name, const TransportFra
   char buffptr[buff_len + 1];
   char interest_name[interest_len + 1];
 
-  strncpy(buffptr, (char*) enc_buffer.buf(), buff_len);
+  for (int i=0; i<buff_len; i++)
+	  buffptr[i] = (char) enc_buffer.buf()[i];
+  //strncpy(buffptr, (char*) enc_buffer.buf(), buff_len);
   strncpy(interest_name, name.toUri().c_str(), interest_len);
 
   buffptr[buff_len] = '\0';
@@ -122,10 +124,10 @@ VmacTransport::sendVmac(const Block& packet, const Name name, const TransportFra
   printf("Sending vmac frame with interest name: %s and interest length: %d and data length: %d\n", interest_name, interest_len, buff_len);
   int i;
   for (i=0; i<buff_len; i++)
-	  printf("buffptr[%d]=%d\n", i, buffptr[i]);
+	  printf("buffptr[%d]=%" PRIu8 ", %" PRIu8 "\n", i, buffptr[i], enc_buffer.buf()[i]);
   fflush(stdout);
   NFD_LOG_DEBUG("Sending vmac frame with interest name: " << name << " data length: " << buff_len);
-  send_vmac(send_type, 0, 0, (char*) buffptr, (uint16_t) buff_len, (char*) interest_name, (uint16_t) interest_len);
+  send_vmac(send_type, 0, 0, (char*) enc_buffer.buf(), (uint16_t) buff_len, (char*) interest_name, (uint16_t) interest_len);
 }
 
 uint8_t

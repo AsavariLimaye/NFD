@@ -122,8 +122,8 @@ BOOST_AUTO_TEST_CASE(SendInterest)
   BOOST_CHECK(transport != nullptr);
   BOOST_CHECK(service != nullptr);
   face->sendInterest(*interest1, 0);
-/*
   BOOST_CHECK_EQUAL(service->getCounters().nOutInterests, 1);
+/*
   BOOST_REQUIRE_EQUAL(transport->sentPackets.size(), 1);
   lp::Packet interest1pkt(transport->sentPackets.back().packet);
   BOOST_CHECK(interest1pkt.has<lp::FragmentField>());
