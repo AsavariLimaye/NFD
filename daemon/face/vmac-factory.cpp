@@ -85,6 +85,13 @@ shared_ptr<Face>
 VmacFactory::createMulticastFace()
 {
   auto key = std::move("vmac");
+  
+  auto found = m_mcastFaces.find(key);
+  if (found != m_mcastFaces.end()) {
+    NFD_LOG_DEBUG("Multicast vmac already exists");
+    return found->second;
+  }
+  
   VmacLinkService::Options opts;
   opts.allowFragmentation = true;
   opts.allowReassembly = true;

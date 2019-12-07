@@ -389,6 +389,7 @@ VmacLinkService::decodeInterest(const Block& netPkt, const lp::Packet& firstPkt,
     interest->setTag(make_shared<lp::PitToken>(firstPkt.get<lp::PitTokenField>()));
   }
 
+  NFD_LOG_DEBUG("Received a valid interest");
   this->receiveInterest(*interest, endpointId);
 }
 
@@ -443,6 +444,7 @@ VmacLinkService::decodeData(const Block& netPkt, const lp::Packet& firstPkt,
     }
   }
 
+  NFD_LOG_DEBUG("Received a valid data");
   this->receiveData(*data, endpointId);
 }
 
@@ -488,6 +490,7 @@ VmacLinkService::decodeNack(const Block& netPkt, const lp::Packet& firstPkt,
     return;
   }
 
+  NFD_LOG_DEBUG("Received a valid nack");
   this->receiveNack(nack, endpointId);
 }
 

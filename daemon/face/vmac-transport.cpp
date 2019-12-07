@@ -109,6 +109,9 @@ VmacTransport::sendVmac(const Block& packet, const Name name, const TransportFra
   strncpy(buffptr, (char*) enc_buffer.buf(), buff_len);
   strncpy(interest_name, name.toUri().c_str(), interest_len);
 
+  buffptr[buff_len] = '\0';
+  interest_name[interest_len] = '\0';
+
   uint8_t send_type = getVmacType(type);
   
   printf("Sending vmac frame with interest name: %s and interest length: %d and data length: %d\n", interest_name, interest_len, buff_len);
