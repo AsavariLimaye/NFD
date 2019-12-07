@@ -59,7 +59,7 @@ protected:
 
   void
   initialize(const VmacLinkService::Options& options,
-             ssize_t mtu = 20,
+             ssize_t mtu = 2000,
              ssize_t sendQueueCapacity = QUEUE_UNSUPPORTED)
   {
     face = make_unique<Face>(make_unique<VmacLinkService>(options),
@@ -107,10 +107,18 @@ BOOST_AUTO_TEST_CASE(SendInterest)
   // Initialize with Options that disables all services
   VmacLinkService::Options options;
   options.allowLocalFields = false;
+  options.reliabilityOptions.isEnabled = true;
+  options.allowFragmentation = true;
+  
   initialize(options);
 
+  char interestName[3001] = "/localhost/test/";
+  for (int i=16; i<3000; i++)
+	  interestName[i] = 'a';
+  interestName[3000] = '\0';
+  printf("%d\n", strlen(interestName));
   auto interest1 =
-  makeInterest("/localhost/test/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+  makeInterest(interestName);
   BOOST_CHECK(transport != nullptr);
   BOOST_CHECK(service != nullptr);
   face->sendInterest(*interest1, 0);

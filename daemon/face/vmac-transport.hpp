@@ -66,6 +66,7 @@ private:
 
 public:
   static boost::signals2::signal<void (uint8_t type,uint64_t enc, char* buff, uint16_t len, uint16_t seq, char* interestName, uint16_t interestNameLen)> m_signal;
+  static bool m_isRegistered;
 
 private:
   void initVmac();

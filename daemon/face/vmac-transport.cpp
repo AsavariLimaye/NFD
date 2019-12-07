@@ -33,6 +33,8 @@ namespace face {
 
 boost::signals2::signal<void (uint8_t type,uint64_t enc, char* buff, uint16_t len, uint16_t seq, char* interestName, uint16_t interestNameLen)> VmacTransport::m_signal;
 
+bool VmacTransport::m_isRegistered = false;
+
 NFD_LOG_INIT(VmacTransport);
 
 void vmac_callback(uint8_t type,uint64_t enc, char* buff, uint16_t len, uint16_t seq, char* interestName, uint16_t interestNameLen)
@@ -90,6 +92,9 @@ VmacTransport::doSend(const Block& packet, const Name name, const TransportFrame
 void
 VmacTransport::initVmac()
 {
+  if (VmacTransport::m_isRegistered)
+	  return;
+  VmacTransport::m_isRegistered = true;
   void (*ptr) (uint8_t a, uint64_t b, char* c, uint16_t d, uint16_t e, char* f, uint16_t g) = &vmac_callback;
   VmacTransport::m_signal.connect(boost::bind(&VmacTransport::vmacCallback, this, _1, _2, _3, _4, _5, _6, _7));
   vmac_register((void*) ptr);
