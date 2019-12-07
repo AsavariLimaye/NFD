@@ -86,9 +86,11 @@ VmacLinkService::sendLpPacket(lp::Packet&& pkt, const Name name, const Transport
   auto block = pkt.wireEncode();
   if (mtu != MTU_UNLIMITED && block.size() > static_cast<size_t>(mtu)) {
     ++this->nOutOverMtu;
+    printf("attempted to send packet over MTU limit %d/%d \n", block.size(), mtu);
     NFD_LOG_FACE_WARN("attempted to send packet over MTU limit");
     return;
   }
+  printf("Sending LpPacket");
   this->sendPacket(block, name, type, endpointId);
 }
 
@@ -177,8 +179,10 @@ VmacLinkService::sendNetPacket(lp::Packet&& pkt, const Name name, const Transpor
 
   if (m_options.allowFragmentation && mtu != MTU_UNLIMITED) {
     bool isOk = false;
+    printf("Fragmenting packet..\n");
     std::tie(isOk, frags) = m_fragmenter.fragmentPacket(pkt, mtu);
     if (!isOk) {
+      printf("Fragmentation Failed..\n");
       // fragmentation failed (warning is logged by LpFragmenter)
       ++this->nFragmentationErrors;
       return;
@@ -211,6 +215,7 @@ VmacLinkService::sendNetPacket(lp::Packet&& pkt, const Name name, const Transpor
   }
 
   for (lp::Packet& frag : frags) {
+    printf("Sending a fragment\n");
     this->sendLpPacket(std::move(frag), name, type, endpointId);
   }
 }
