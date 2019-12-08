@@ -108,23 +108,13 @@ VmacTransport::sendVmac(const Block& packet, const Name name, const TransportFra
   size_t buff_len = enc_buffer.size();
   size_t interest_len = name.toUri().length();
   
-  char buffptr[buff_len + 1];
   char interest_name[interest_len + 1];
-
-  for (int i=0; i<buff_len; i++)
-	  buffptr[i] = (char) enc_buffer.buf()[i];
-  //strncpy(buffptr, (char*) enc_buffer.buf(), buff_len);
   strncpy(interest_name, name.toUri().c_str(), interest_len);
-
-  buffptr[buff_len] = '\0';
   interest_name[interest_len] = '\0';
 
   uint8_t send_type = getVmacType(type);
   
-  printf("Sending vmac frame with interest name: %s and interest length: %d and data length: %d\n", interest_name, interest_len, buff_len);
-  int i;
-  for (i=0; i<buff_len; i++)
-	  printf("buffptr[%d]=%" PRIu8 ", %" PRIu8 "\n", i, buffptr[i], enc_buffer.buf()[i]);
+  printf("Sending vmac frame with interest length: %d and data length: %d\n", interest_len, buff_len);
   fflush(stdout);
   NFD_LOG_DEBUG("Sending vmac frame with interest name: " << name << " data length: " << buff_len);
   send_vmac(send_type, 0, 0, (char*) enc_buffer.buf(), (uint16_t) buff_len, (char*) interest_name, (uint16_t) interest_len);
@@ -142,13 +132,10 @@ VmacTransport::getVmacType(TransportFrameType type) {
 
 void
 VmacTransport::vmacCallback(uint8_t type,uint64_t enc, char* buff, uint16_t len, uint16_t seq, char* interestName, uint16_t interestNameLen) {
-  NFD_LOG_DEBUG("Object callback");
+  NFD_LOG_DEBUG("Object callback received block");
   printf("Received block of length: %d\n", len); 
   // check if received length is more than MAX size
   uint8_t* receiveBuffer = (uint8_t*) buff;
-  for (int i=0; i<len; i++)
-	  printf("buff[%d]=%d\n", i, buff[i]);
-  fflush(stdout);
   bool done = false;
   Block recv_block;
   std::tie(done, recv_block) = Block::fromBuffer(receiveBuffer, (size_t)len);
